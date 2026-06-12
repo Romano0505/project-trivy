@@ -8,8 +8,15 @@ terraform {
 }
 
 provider "google" {
-  project = "project-repo-498812"
+  project = var.project_id
   region  = var.region
+}
+
+# --- VARIABLES ---
+
+variable "project_id" {
+  type        = string
+  description = "The GCP Project ID where resources will be deployed"
 }
 
 variable "region" {
@@ -17,6 +24,8 @@ variable "region" {
   description = "The GCP region to deploy resources into"
   default     = "us-central1"
 }
+
+# --- NETWORKING RESOURCES ---
 
 resource "google_compute_network" "vpc" {
   name                    = "datastream-vpc"
