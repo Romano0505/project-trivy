@@ -1,8 +1,7 @@
-resource "google_service_account" "airflow_sa" {
-  account_id   = "airflow-sa"
-  display_name = "Airflow Service Account"
+resource "google_service_account" "datastream_sa" {
+  account_id   = "datastream-sa"
+  display_name = "Datastream Service Account"
 }
-
 resource "google_project_iam_member" "roles" {
   for_each = toset([
     "roles/storage.admin",
@@ -11,5 +10,5 @@ resource "google_project_iam_member" "roles" {
 
   project = var.project_id
   role    = each.value
-  member  = "serviceAccount:${google_service_account.airflow_sa.email}"
+  member  = "serviceAccount:${google_service_account.datastream_sa.email}"
 }

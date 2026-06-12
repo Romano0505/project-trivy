@@ -214,17 +214,12 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 # Streamlit secrets
-.streamlit/secrets.toml
 
-# Terraform
+# Streamlit
+.streamlit/secrets.toml
+# Local Terraform directories and states
 .terraform/
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 *.tfplan
 .terraform.lock.hcl
-
-# Python
-__pycache__/
-*.py[cod]
-.env
-.venv
