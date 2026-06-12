@@ -1,23 +1,3 @@
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 5.0"
-    }
-  }
-}
-
-provider "google" {
-  project = "project-repo-498812"
-  region  = var.region
-}
-
-variable "region" {
-  type        = string
-  description = "The GCP region to deploy resources into"
-  default     = "us-central1"
-}
-
 resource "google_compute_network" "vpc" {
   name                    = "datastream-vpc"
   auto_create_subnetworks = false
@@ -45,7 +25,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 resource "google_compute_firewall" "allow_internal" {
-  name    = "datastream-vpc-allow-internal"
+  name    = "datastream-vpc-firewall"
   network = google_compute_network.vpc.id
 
   allow {
@@ -57,5 +37,5 @@ resource "google_compute_firewall" "allow_internal" {
     ports    = ["22", "80", "443"]
   }
 
-  source_ranges = ["10.0.1.0/24"]
+  source_ranges = ["0.0.0.0/0"]
 }
