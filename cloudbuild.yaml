@@ -1,0 +1,17 @@
+steps:
+- name: 'docker.io/aquasec/trivy:latest'
+  entrypoint: '/bin/sh'
+  args:
+  - '-c'
+  - |
+    trivy config --severity HIGH,CRITICAL --ignore-unfixed --format json --output trivy-report.json .
+
+- name: 'gcr.io/cloud-builders/gsutil'
+  args:
+  - cp
+  - trivy-report.json
+  - gs://project-repo-498812-trivy-reports/$BUILD_ID/trivy-report.json
+
+substitutions:
+  _TRIVY_REPORT_BUCKET: "project-repo-498812-trivy-reports"
+timeout: 120s
