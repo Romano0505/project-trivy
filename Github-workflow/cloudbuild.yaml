@@ -1,0 +1,124 @@
+steps:
+
+# ─────────────────────────────────────────────
+# 1. Security Scan (IaC misconfig, vulnerable deps, secrets)
+# ─────────────────────────────────────────────
+- name: 'docker.io/aquasec/trivy:latest'
+  id: 'trivy-scan'
+  entrypoint: '/bin/sh'
+  args:
+  - '-c'
+  - |
+    echo "Running Trivy filesystem scan on codebase..."
+
+    trivy fs \
+      --scanners vuln,config,secret \
+      --severity HIGH,CRITICAL \
+      --ignore-unfixed \
+      --exit-code 1 \
+      --format json \
+      --output trivy-report.json .
+
+    SCAN_STATUS=$$?
+    echo $$SCAN_STATUS > exit_status.txt
+
+    if [ "$$SCAN_STATUS" -ne 0 ]; then
+      echo "🛑 HIGH or CRITICAL issues found. Build will stop after report upload."
+    else
+      echo "✅ No HIGH/CRITICAL issues found. Proceeding to build."
+    fi
+
+    # Never fail this step itself — let step 3 decide, after the report is uploaded
+    exit 0
+
+# ─────────────────────────────────────────────
+# 2. Upload scan report to Cloud Storage (always runs, pass or fail)
+# ─────────────────────────────────────────────
+- name: 'gcr.io/cloud-builders/gsutil'
+  id: 'upload-report'
+  args:
+  - cp
+  - trivy-report.json
+  - gs://${_TRIVY_REPORT_BUCKET}/$BUILD_ID/trivy-report.json
+
+# ─────────────────────────────────────────────
+# 3. Gatekeeper — stop the pipeline here if the scan failed
+# ─────────────────────────────────────────────
+- name: 'ubuntu'
+  id: 'security-gate'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    EXIT_STATUS=$(cat exit_status.txt)
+    if [ "$$EXIT_STATUS" -ne 0 ]; then
+      echo "🛑 SECURITY GATE FAILED — HIGH/CRITICAL issues found."
+      echo "Report: gs://${_TRIVY_REPORT_BUCKET}/$BUILD_ID/trivy-report.json"
+      echo "Terraform build steps will NOT run."
+      exit 1
+    else
+      echo "✅ Security gate passed. Proceeding to Terraform."
+    fi
+
+# ─────────────────────────────────────────────
+# 4. Create Terraform backend bucket if needed
+# ─────────────────────────────────────────────
+- name: 'gcr.io/cloud-builders/gsutil'
+  id: 'bootstrap-tf-backend'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    if gsutil ls "gs://${_TF_STATE_BUCKET}" >/dev/null 2>&1; then
+      echo "Terraform state bucket gs://${_TF_STATE_BUCKET} already exists."
+    else
+      echo "Creating Terraform state bucket gs://${_TF_STATE_BUCKET}..."
+      gsutil mb -p ${PROJECT_ID} -l us-east1 "gs://${_TF_STATE_BUCKET}"
+    fi
+
+# ─────────────────────────────────────────────
+# 5. Terraform Init
+# ─────────────────────────────────────────────
+- name: 'hashicorp/terraform:1.9'
+  id: 'tf-init'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    cd ${_TF_DIR}
+    terraform init -input=false
+
+# ─────────────────────────────────────────────
+# 6. Terraform Plan (saved to a file so apply uses exactly what was planned)
+# ─────────────────────────────────────────────
+- name: 'hashicorp/terraform:1.9'
+  id: 'tf-plan'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    cd ${_TF_DIR}
+    terraform import -input=false google_compute_network.vpc_network "projects/${PROJECT_ID}/global/networks/datastream-vpc" || true
+    terraform plan -input=false -out=tfplan
+
+# ─────────────────────────────────────────────
+# 7. Terraform Apply (only reached if steps 1–6 all succeeded)
+# ─────────────────────────────────────────────
+- name: 'hashicorp/terraform:1.9'
+  id: 'tf-apply'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    cd ${_TF_DIR}
+    terraform apply -input=false -auto-approve tfplan
+
+substitutions:
+  _TRIVY_REPORT_BUCKET: "project-repo-498812-trivy-bucket"
+  _TF_DIR: "terraform"          # path to your Terraform root module in the repo
+  _TF_STATE_BUCKET: "project-2-503411-tf-state-20260727-01"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 1200s   # bumped up from 120s — scan + plan + apply need more roomadd . gcloud auth login
