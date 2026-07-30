@@ -9,7 +9,7 @@ resource "google_project_service" "artifact_registry" {
 # Provision a private Docker repository in Artifact Registry
 resource "google_artifact_registry_repository" "datastream_repo" {
   location      = var.region
-  repository_id = "datastream-repo"
+  repository_id = "project-trivy"
   description   = "Private Docker repository for DataStream Airflow images"
   format        = "DOCKER"
 

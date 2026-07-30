@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "project-repo-498812-terraform-state" # Change this to your unique bucket name
-    prefix = "terraform/state"
+    bucket  = "project_trivy_1"   # Replace with your actual bucket name
+    prefix  = "terraform/state"    # Creates a folder inside the bucket for organization
   }
-} 
+}
