@@ -41,4 +41,6 @@ steps:
   - trivy-report.json
   - gs://${_TRIVY_REPORT_BUCKET}/$BUILD_ID/trivy-report.json
 
-#trigger test 
+# Tell Cloud Build to send logs to Cloud Logging instead of a storage bucket
+options:
+  logging: CLOUD_LOGGING_ONLY
