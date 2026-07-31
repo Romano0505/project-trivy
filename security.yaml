@@ -7,7 +7,7 @@ on:
 
 jobs:
   dev-scan:
-    uses: YOUR_GITHUB_ORG/gcp-security-workflows/.github/workflows/dev-scan.yml@dev
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/dev-scan.yml@dev
     with:
       results_bucket: results_bucket1
     secrets:
