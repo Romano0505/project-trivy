@@ -10,7 +10,8 @@ permissions:
 
 jobs:
   dev-scan:
-    uses: arnold-sa/gcp-security-workflows/.github/workflows/dev-scan.yml@main
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/dev-scan.yml@dev
+    
     with:
       results_bucket: project_trivy_1
     secrets:
