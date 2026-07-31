@@ -7,11 +7,11 @@ on:
 permissions:
   contents: read
   id-token: write
+  security-events: write
 
 jobs:
   dev-scan:
     uses: arnold-sa/gcp-security-workflows/.github/workflows/dev-scan.yml@dev
-    
     with:
       results_bucket: project_trivy_1
     secrets:
