@@ -1,0 +1,21 @@
+name: test-prowler
+
+"on":
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  security-events: write
+
+jobs:
+  prowler-scan:
+    # Manual-only caller for testing the reusable Prowler GCP scan.
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/deploy-scan.yml@dev
+    with:
+      gcp_project_id: ${{ vars.GCP_PROJECT_ID }}
+      results_bucket: ${{ vars.RESULTS_BUCKET }}
+    secrets:
+      WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+      PROWLER_SA: ${{ secrets.PROWLER_SA }}
+      RESULTS_UPLOADER_SA: ${{ secrets.RESULTS_UPLOADER_SA }}
