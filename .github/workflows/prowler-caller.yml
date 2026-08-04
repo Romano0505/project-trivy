@@ -14,7 +14,7 @@ jobs:
     uses: arnold-sa/gcp-security-workflows/.github/workflows/deploy-scan.yml@dev
     with:
       gcp_project_id: ${{ vars.GCP_PROJECT_ID }}
-      results_bucket: ${{ vars.RESULTS_BUCKET }}
+      results_bucket: project_trivy_1
     secrets:
       WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
       PROWLER_SA: ${{ secrets.PROWLER_SA }}
