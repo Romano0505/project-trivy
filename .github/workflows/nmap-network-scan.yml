@@ -1,19 +1,17 @@
-name: KICS IaC scan
+name: Nmap network scan
 
 "on":
-  
   workflow_dispatch:
 
 permissions:
   contents: read
   id-token: write
-  security-events: write
 
 jobs:
-  kics-iac-scan:
-    uses: arnold-sa/gcp-security-workflows/.github/workflows/kics-iac-scan.yml@dev
+  nmap-network-scan:
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-network-scan.yml@dev
     with:
-      scan_path: "."
+      targets: ${{ vars.SCAN_TARGET_CIDR }}
       results_bucket: project_trivy_1
     secrets:
       WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
