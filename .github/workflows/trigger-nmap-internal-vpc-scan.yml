@@ -1,0 +1,15 @@
+name: Scheduled VPC Scan
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  call-nmap-workflow:
+    # Format: uses: owner/repo/.github/workflows/filename.yml@branch
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-internal.yml@dev
+    with:
+      target_cidr: "10.0.1.0/24" 
+      results_bucket: "project_trivy_1"
+    secrets:
+      WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+      RESULTS_UPLOADER_SA: ${{ secrets.RESULTS_UPLOADER_SA }}
