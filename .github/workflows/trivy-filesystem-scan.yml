@@ -1,7 +1,8 @@
-name: KICS IaC scan
+name: Trivy filesystem scan
 
-"on":
+on:
   workflow_dispatch:
+  
 
 permissions:
   contents: read
@@ -9,10 +10,9 @@ permissions:
   security-events: write
 
 jobs:
-  kics-iac-scan:
-    uses: arnold-sa/gcp-security-workflows/.github/workflows/kics-iac-scan.yml@dev
+  trivy-filesystem-scan:
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/trivy-dev-filesystem-scan.yml@dev
     with:
-      scan_path: "."
       results_bucket: project_trivy_1
     secrets:
       WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
