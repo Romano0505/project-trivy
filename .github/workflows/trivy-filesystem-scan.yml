@@ -8,78 +8,11 @@ permissions:
   id-token: write
   security-events: write
 
-env:
-  RESULTS_BUCKET: project_trivy_1
-
 jobs:
   trivy-filesystem-scan:
-    name: Trivy filesystem scan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.RESULTS_UPLOADER_SA }}
-
-      - name: Set up gcloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Calculate GCS partition path
-        id: partition
-        shell: bash
-        run: |
-          echo "year=$(date -u +%Y)" >> "$GITHUB_OUTPUT"
-          echo "month=$(date -u +%m)" >> "$GITHUB_OUTPUT"
-          echo "day=$(date -u +%d)" >> "$GITHUB_OUTPUT"
-
-      - name: Prepare results directory
-        run: mkdir -p trivy-fs-results
-
-      - name: Run filesystem scan as JSON
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          scanners: vuln,secret,misconfig
-          format: json
-          output: trivy-fs-results/trivy-fs.json
-          exit-code: "0"
-          ignore-unfixed: true
-
-      - name: Run filesystem scan as SARIF
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          scanners: vuln,secret,misconfig
-          format: sarif
-          output: trivy-fs-results/trivy-fs.sarif
-          exit-code: "1"
-          ignore-unfixed: true
-
-      - name: Upload reports as GitHub artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: trivy-fs-${{ github.run_id }}
-          path: trivy-fs-results/
-          if-no-files-found: warn
-          retention-days: 14
-
-      - name: Upload SARIF to GitHub code scanning
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: trivy-fs-results/trivy-fs.sarif
-        continue-on-error: true
-
-      - name: Upload reports to GCS
-        if: always()
-        run: |
-          gcloud storage cp -r trivy-fs-results/* \
-            "gs://${RESULTS_BUCKET}/year=${{ steps.partition.outputs.year }}/month=${{ steps.partition.outputs.month }}/day=${{ steps.partition.outputs.day }}/tool=trivy_fs/run_id=${{ github.run_id }}/"
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/trivy-dev-filesystem-scan.yml@dev
+    with:
+      results_bucket: project_trivy_1
+    secrets:
+      WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+      RESULTS_UPLOADER_SA: ${{ secrets.RESULTS_UPLOADER_SA }}
