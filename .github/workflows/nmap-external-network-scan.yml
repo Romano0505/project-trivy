@@ -1,17 +1,17 @@
-name: External Nmap network scan
+name: Internal Nmap network scan
 
-"on":
+on:
   workflow_dispatch:
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
-  nmap-network-scan:
-    uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-external-scan.yml@dev
+  scan:
+    permissions:
+      contents: read
+      id-token: write
+
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-internal-scan.yml@dev
     with:
-      targets: ${{ vars.SCAN_TARGET_CIDR }}
+      target_cidr: ${{ vars.SCAN_TARGET_CIDR }}
       results_bucket: project_trivy_1
     secrets:
       WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
