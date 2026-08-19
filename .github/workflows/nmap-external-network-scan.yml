@@ -1,4 +1,4 @@
-name: Internal Nmap network scan
+name: External Nmap network scan
 
 on:
   workflow_dispatch:
