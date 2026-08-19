@@ -11,7 +11,7 @@ jobs:
 
     uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-external-scan.yml@dev
     with:
-      target_cidr: ${{ vars.SCAN_TARGET_CIDR }}
+      targets: ${{ vars.SCAN_TARGET_CIDR }}
       results_bucket: project_trivy_1
     secrets:
       WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
