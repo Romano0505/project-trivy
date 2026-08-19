@@ -9,7 +9,7 @@ jobs:
       contents: read
       id-token: write
 
-    uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-internal-scan.yml@dev
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-external-scan.yml@dev
     with:
       target_cidr: ${{ vars.SCAN_TARGET_CIDR }}
       results_bucket: project_trivy_1
