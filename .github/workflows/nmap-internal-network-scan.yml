@@ -5,10 +5,14 @@ on:
 
 jobs:
   call-nmap-workflow:
+    permissions:
+      contents: read
+      id-token: write
+
     # Format: uses: owner/repo/.github/workflows/filename.yml@branch
     uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-internal-scan.yml@dev
     with:
-      target_cidr: "10.0.1.0/24" 
+      targets: "10.0.1.0/24" 
       results_bucket: "project_trivy_1"
     secrets:
       WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
