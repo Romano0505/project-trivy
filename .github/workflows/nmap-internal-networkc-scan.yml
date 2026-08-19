@@ -1,4 +1,4 @@
-name: NmapInternal Network Scan 
+name: Nmap Internal Network Scan 
 
 on:
   workflow_dispatch: {}
