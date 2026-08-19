@@ -1,6 +1,6 @@
 name: Trivy image scan
 
-"on":
+on:
   workflow_dispatch:
     inputs:
       image:
