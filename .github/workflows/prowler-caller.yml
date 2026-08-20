@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   nmap-network-scan:
-    uses: arnold-sa/gcp-security-workflows/.github/workflows/nmap-network-scan.yml@dev
+    uses: arnold-sa/gcp-security-workflows/.github/workflows/prowler-deploy-gcp-scan.yml@dev
     with:
       targets: ${{ vars.SCAN_TARGET_CIDR }}
       results_bucket: project_trivy_1
