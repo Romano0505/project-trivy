@@ -8,11 +8,12 @@ permissions:
   id-token: write
 
 jobs:
-  nmap-network-scan:
+  prowler-scan:
     uses: arnold-sa/gcp-security-workflows/.github/workflows/prowler-deploy-gcp-scan.yml@dev
     with:
-      targets: ${{ vars.SCAN_TARGET_CIDR }}
+      gcp_project_id: ${{ vars.GCP_PROJECT_ID }}
       results_bucket: project_trivy_1
     secrets:
       WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+      PROWLER_SA: ${{ secrets.PROWLER_SA }}
       RESULTS_UPLOADER_SA: ${{ secrets.RESULTS_UPLOADER_SA }}
