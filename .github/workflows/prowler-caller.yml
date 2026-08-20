@@ -6,6 +6,7 @@ name: Prowler Infrastructure scan
 permissions:
   contents: read
   id-token: write
+  security-events: write
 
 jobs:
   prowler-scan:
